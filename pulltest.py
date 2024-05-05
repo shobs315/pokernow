@@ -6,14 +6,14 @@ from bs4 import BeautifulSoup
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.core.os_manager import ChromeType
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service as ChromeService
 import time
 import pandas as pd
 
 def get_driver():
-    return webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+    return webdriver.Chrome()
 
 def get_ledger(url):
     driver = get_driver()
@@ -59,6 +59,7 @@ def get_ledger(url):
                 players.append(row)
     df = pd.DataFrame(players, columns=titles)
     return df
+import heapq
 
 def generate_payouts(player_net_tuples):
     # Convert net amounts to floats
@@ -73,23 +74,23 @@ def generate_payouts(player_net_tuples):
         if net > 0:
             positive_net.append((name, net))
         elif net < 0:
-            negative_net.append((name, net))
-    
-    # Sort positive and negative net amounts by amount
-    positive_net.sort(key=lambda x: x[1], reverse=True)
-    negative_net.sort(key=lambda x: x[1])
+            # Use a tuple with net amount as key to ensure sorting by net amount
+            heapq.heappush(negative_net, (net, name))
     
     # Initialize list to store payouts
     payouts = []
     
     # Distribute positive net amounts to players with negative net amounts
     for payer, amount in positive_net:
-        while amount > 0:
-            receiver, debt = negative_net.pop(0)
+        while amount > 0 and negative_net:
+            # Extract player with the smallest negative net amount
+            debt, receiver = heapq.heappop(negative_net)
             payment = min(amount, -debt)
             payouts.append((receiver, payer, payment))  # Reverse payer and receiver
             amount -= payment
-            negative_net.append((receiver, debt + payment))
+            # If there is remaining debt, push it back to the heap
+            if debt + payment < 0:
+                heapq.heappush(negative_net, (debt + payment, receiver))
     
     return payouts
 
