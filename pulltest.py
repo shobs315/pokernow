@@ -13,7 +13,9 @@ import time
 import pandas as pd
 
 def get_driver():
-    return webdriver.Chrome()
+    service = Service()
+    options = Options()
+    return webdriver.Chrome(service=service, options=options)
 
 def get_ledger(url):
     driver = get_driver()
