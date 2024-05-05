@@ -18,50 +18,49 @@ def get_driver():
     return webdriver.Chrome()
 
 def get_ledger(url):
-    with webdriver.Chrome(options=Options(),
-                        service=Service()) as driver:
-        driver.get(url)
-        #time.sleep(1)
-        actions = ActionChains(driver)
-        actions.send_keys(Keys.CONTROL + 'l').perform()
-        # Wait for the ledger table to load (you might need to adjust the sleep time based on the page load time)
-        time.sleep(1)
-        ledger_button = driver.find_element(By.CLASS_NAME, 'ledger-button')
-        ledger_button.click()
-        time.sleep(1)
-        # Get the page source after the table is loaded
-        page_source = driver.page_source
+    driver = get_driver()
+    driver.get(url)
+    #time.sleep(1)
+    actions = ActionChains(driver)
+    actions.send_keys(Keys.CONTROL + 'l').perform()
+    # Wait for the ledger table to load (you might need to adjust the sleep time based on the page load time)
+    time.sleep(1)
+    ledger_button = driver.find_element(By.CLASS_NAME, 'ledger-button')
+    ledger_button.click()
+    time.sleep(1)
+    # Get the page source after the table is loaded
+    page_source = driver.page_source
 
-        # Close the webdriver
-        driver.quit()
+    # Close the webdriver
+    driver.quit()
 
-        # Parse the HTML content of the page
-        soup = BeautifulSoup(page_source, 'html.parser')
-        
-        tables = soup.find_all('table')
-        first = True
-        players = []
-        # Iterate through each table and print its content
-        for table in tables:
-            #print(table)
-            # Extract table headers
-            headers = [header.text.strip() for header in table.find_all('th')]
-            if headers:
-                print(headers)
-            # Extract table rows
-            rows = []
-            for row in table.find_all('tr'):
-                rows.append([cell.text.strip() for cell in row.find_all('td')])
-            # Print table rows
-            for row in rows:
-                if first:
-                    titles = row
-                    first = False
-                else:
-                    row[0] = row[0].split("@")[0]
-                    players.append(row)
-        df = pd.DataFrame(players, columns=titles)
-        return df
+    # Parse the HTML content of the page
+    soup = BeautifulSoup(page_source, 'html.parser')
+    
+    tables = soup.find_all('table')
+    first = True
+    players = []
+    # Iterate through each table and print its content
+    for table in tables:
+        #print(table)
+        # Extract table headers
+        headers = [header.text.strip() for header in table.find_all('th')]
+        if headers:
+            print(headers)
+        # Extract table rows
+        rows = []
+        for row in table.find_all('tr'):
+            rows.append([cell.text.strip() for cell in row.find_all('td')])
+        # Print table rows
+        for row in rows:
+            if first:
+                titles = row
+                first = False
+            else:
+                row[0] = row[0].split("@")[0]
+                players.append(row)
+    df = pd.DataFrame(players, columns=titles)
+    return df
 import heapq
 
 def generate_payouts(player_net_tuples):
