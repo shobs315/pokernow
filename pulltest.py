@@ -1,3 +1,4 @@
+import streamlit as st
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
@@ -10,12 +11,12 @@ from webdriver_manager.core.os_manager import ChromeType
 from selenium.webdriver.common.by import By
 import time
 import pandas as pd
-import streamlit as st
 
-# Set up the Selenium webdriver (make sure to install the appropriate webdriver for your browser)
-driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+def get_driver():
+    return webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
 
 def get_ledger(url):
+    driver = get_driver()
     driver.get(url)
     #time.sleep(1)
     actions = ActionChains(driver)
@@ -27,7 +28,6 @@ def get_ledger(url):
     time.sleep(1)
     # Get the page source after the table is loaded
     page_source = driver.page_source
-
 
     # Close the webdriver
     driver.quit()
@@ -93,12 +93,11 @@ def generate_payouts(player_net_tuples):
     
     return payouts
 
-
 # URL of the Poker Now website
 with st.form("URL"):
     url = st.text_input("Enter game URL")
     submitted = st.form_submit_button("Get Payouts")
-if url:
+if url and submitted:
     # Open the URL in the browser
     df = get_ledger(url)
 
