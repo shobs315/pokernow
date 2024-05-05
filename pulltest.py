@@ -2,13 +2,18 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.core.os_manager import ChromeType
 from selenium.webdriver.common.by import By
 import time
 import pandas as pd
 import streamlit as st
 
 # Set up the Selenium webdriver (make sure to install the appropriate webdriver for your browser)
-driver = webdriver.Chrome()  # Example: Chrome webdriver
+driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
 
 def get_ledger(url):
     driver.get(url)
