@@ -15,7 +15,7 @@ import pandas as pd
 def get_driver():
     service = Service()
     options = Options()
-    return webdriver.Chrome(service=service, options=options)
+    return webdriver.Chrome()
 
 def get_ledger(url):
     driver = get_driver()
