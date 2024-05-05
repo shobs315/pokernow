@@ -1,1 +1,2 @@
-chromedriver-autoinstaller
+chromium
+chromium-driver
