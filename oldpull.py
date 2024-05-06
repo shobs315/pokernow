@@ -61,6 +61,7 @@ def get_ledger(url):
                 players.append(row)
     df = pd.DataFrame(players, columns=titles)
     return df
+
 import heapq
 
 def generate_payouts(player_net_tuples):
@@ -107,6 +108,7 @@ if url and submitted:
     st.write("Ledger:")
     st.dataframe(df)
     player_net_tuples = list(df[['Player', 'Net↓']].to_records(index=False))[:-1]
+    st.write(player_net_tuples)
     payouts = generate_payouts(player_net_tuples)
     
     for payer, receiver, amount in payouts:

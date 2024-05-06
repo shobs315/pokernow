@@ -18,7 +18,8 @@ def get_driver():
     return webdriver.Chrome()
 
 def get_ledger(url):
-    with webdriver.Chrome("chromedriver.exe") as driver:
+    options = Options()
+    with webdriver.Chrome(options=options, service=Service()) as driver:
         driver.get(url)
         #time.sleep(1)
         actions = ActionChains(driver)
@@ -43,11 +44,6 @@ def get_ledger(url):
         # Iterate through each table and print its content
         for table in tables:
             #print(table)
-            # Extract table headers
-            headers = [header.text.strip() for header in table.find_all('th')]
-            if headers:
-                print(headers)
-            # Extract table rows
             rows = []
             for row in table.find_all('tr'):
                 rows.append([cell.text.strip() for cell in row.find_all('td')])
@@ -107,6 +103,7 @@ if url and submitted:
     st.write("Ledger:")
     st.dataframe(df)
     player_net_tuples = list(df[['Player', 'Net↓']].to_records(index=False))[:-1]
+    st.write(player_net_tuples)
     payouts = generate_payouts(player_net_tuples)
     
     for payer, receiver, amount in payouts:
