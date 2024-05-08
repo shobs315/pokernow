@@ -95,6 +95,13 @@ def generate_payouts(player_net_tuples):
     
     return payouts
 
+st.set_page_config(
+    page_title="PokerNow Payouts",
+    page_icon="chart_with_upwards_trend",
+)
+
+st.title("PokerNow Payouts")
+
 # URL of the Poker Now website
 with st.form("URL"):
     url = st.text_input("Enter game URL")
