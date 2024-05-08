@@ -5,12 +5,10 @@ from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.core.os_manager import ChromeType
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service as ChromeService
 import time
 import pandas as pd
+import heapq
 
 def get_driver():
     service = Service()
@@ -60,7 +58,8 @@ def get_ledger(url):
                 players.append(row)
     df = pd.DataFrame(players, columns=titles)
     return df
-import heapq
+
+
 
 def generate_payouts(player_net_tuples):
     # Convert net amounts to floats
@@ -105,10 +104,10 @@ if url and submitted:
     # Open the URL in the browser
     df = get_ledger(url)
 
-    st.write("Ledger:")
+    st.header("Ledger:")
     st.dataframe(df)
     player_net_tuples = list(df[['Player', 'Net↓']].to_records(index=False))[:-1]
     payouts = generate_payouts(player_net_tuples)
-    st.write("PAYOUTS")
+    st.header("Payouts:")
     for payer, receiver, amount in payouts:
         st.write(f"{payer.strip()} pays {receiver.strip()} {amount:.2f}")
