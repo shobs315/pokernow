@@ -95,6 +95,8 @@ def generate_payouts(player_net_tuples):
     
     return payouts
 
+st.title("")
+
 # URL of the Poker Now website
 with st.form("URL"):
     url = st.text_input("Enter game URL")
@@ -106,7 +108,6 @@ if url and submitted:
     st.write("Ledger:")
     st.dataframe(df)
     player_net_tuples = list(df[['Player', 'Net↓']].to_records(index=False))[:-1]
-    st.write(player_net_tuples)
     payouts = generate_payouts(player_net_tuples)
     st.write("PAYOUTS")
     for payer, receiver, amount in payouts:
