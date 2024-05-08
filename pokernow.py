@@ -81,33 +81,38 @@ def generate_payouts(player_net_tuples):
     payouts = []
     
     # Distribute positive net amounts to players with negative net amounts
-    for payer, amount in positive_net:
+    for receiver, amount in positive_net:
         while amount > 0 and negative_net:
             # Extract player with the smallest negative net amount
-            debt, receiver = heapq.heappop(negative_net)
+            debt, payer = heapq.heappop(negative_net)
             payment = min(amount, -debt)
-            payouts.append((receiver, payer, payment))  # Reverse payer and receiver
+            payouts.append((payer, receiver, payment))  # Reverse payer and receiver
             amount -= payment
             # If there is remaining debt, push it back to the heap
             if debt + payment < 0:
-                heapq.heappush(negative_net, (debt + payment, receiver))
-    
+                heapq.heappush(negative_net, (debt + payment, payer))
+                
+    payouts.sort(key=lambda x: x[0])
     return payouts
 
-st.title("")
+st.set_page_config(page_title='PokerNow Payouts', page_icon=":spades:")
 
-# URL of the Poker Now website
+st.title("Poker Now Payouts :spades:")
+
+
 with st.form("URL"):
     url = st.text_input("Enter game URL")
     submitted = st.form_submit_button("Get Payouts")
 if url and submitted:
-    # Open the URL in the browser
-    df = get_ledger(url)
 
+    df = get_ledger(url)
+    
     st.header("Ledger:")
     st.dataframe(df)
     player_net_tuples = list(df[['Player', 'Net↓']].to_records(index=False))[:-1]
+    
     payouts = generate_payouts(player_net_tuples)
+    
     st.header("Payouts:")
     for payer, receiver, amount in payouts:
         st.write(f"{payer.strip()} pays {receiver.strip()} {amount:.2f}")
