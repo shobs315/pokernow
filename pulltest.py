@@ -15,7 +15,10 @@ import pandas as pd
 def get_driver():
     service = Service()
     options = Options()
-    return webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    return webdriver.Chrome(options=options)
 
 def get_ledger(url):
     
