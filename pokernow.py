@@ -95,7 +95,7 @@ def generate_payouts(player_net_tuples):
     payouts.sort(key=lambda x: x[0])
     return payouts
 
-st.set_page_config(page_title='PokerNow Payouts', page_icon=":spades:")
+st.set_page_config(page_title='PokerNow Payouts', page_icon=":spades:", layout='wide')
 
 st.title("Poker Now Payouts :spades:")
 
@@ -107,12 +107,19 @@ if url and submitted:
 
     df = get_ledger(url)
     
-    st.header("Ledger:")
-    st.dataframe(df)
+    
+    
     player_net_tuples = list(df[['Player', 'Net↓']].to_records(index=False))[:-1]
     
     payouts = generate_payouts(player_net_tuples)
-    
-    st.header("Payouts:")
-    for payer, receiver, amount in payouts:
-        st.write(f"{payer.strip()} pays {receiver.strip()} {amount:.2f}")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.header("Ledger:")
+        st.dataframe(df)
+
+    # Display payouts in the second column
+    with col2:
+        st.header("Payouts:")
+        for payer, receiver, amount in payouts:
+            st.write(f"{payer.strip()} pays {receiver.strip()} {amount:.2f}")
