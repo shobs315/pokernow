@@ -18,6 +18,12 @@ def get_driver():
     options.add_argument("--disable-dev-shm-usage")
     return webdriver.Chrome(options=options)
 
+def df_to_float(value):
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return value
+
 def get_ledger(url):
     
     driver = get_driver()
@@ -57,7 +63,9 @@ def get_ledger(url):
                 row[0] = row[0].split("@")[0]
                 players.append(row)
     df = pd.DataFrame(players, columns=titles)
-    return df
+    df.rename(columns={'Net↓':'Net'}, inplace=True)
+    
+    return df.iloc[:-1], list(df.iloc[-1])
 
 
 
@@ -105,18 +113,24 @@ with st.form("URL"):
     submitted = st.form_submit_button("Get Payouts")
 if url and submitted:
 
-    df = get_ledger(url)
+    df, total = get_ledger(url)
     
     
     
-    player_net_tuples = list(df[['Player', 'Net↓']].to_records(index=False))[:-1]
+    player_net_tuples = list(df[['Player', 'Net']].to_records(index=False))
     
     payouts = generate_payouts(player_net_tuples)
+    cols = ["", "Buy-In", "Buy-Out", "Stack"]
+
+    # Create DataFrame from list and transpose it
+    total_df = pd.DataFrame([total[:-1]], columns=cols)
 
     col1, col2 = st.columns(2)
     with col1:
         st.header("Ledger:")
-        st.dataframe(df)
+        st.dataframe(df, hide_index=True)
+        
+        st.dataframe(total_df, hide_index=True)
 
     # Display payouts in the second column
     with col2:
