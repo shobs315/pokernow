@@ -59,8 +59,6 @@ def get_ledger(url):
     df = pd.DataFrame(players, columns=titles)
     return df
 
-
-
 def generate_payouts(player_net_tuples):
     # Convert net amounts to floats
     player_net_tuples = [(name.strip(), float(net)) for name, net in player_net_tuples]
@@ -92,12 +90,14 @@ def generate_payouts(player_net_tuples):
             if debt + payment < 0:
                 heapq.heappush(negative_net, (debt + payment, payer))
                 
+    #sort so the same name has the payouts together            
     payouts.sort(key=lambda x: x[0])
     return payouts
 
 st.set_page_config(page_title='PokerNow Payouts', page_icon=":spades:")
 
 st.title("Poker Now Payouts :spades:")
+st.write("This app can be used to generate the payouts for any poker game played on PokerNow. Just copy and paste the game link below")
 
 
 with st.form("URL"):
