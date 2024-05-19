@@ -15,7 +15,6 @@ from bs4 import BeautifulSoup
 
 
 def get_driver():
-    service = Service()
     options = Options()
     options.add_argument("--headless")
     options.add_argument("--no-sandbox")
