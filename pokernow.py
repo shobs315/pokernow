@@ -72,14 +72,13 @@ def get_ledger(url):
 
 def generate_payouts(player_net_tuples):
     # Convert net amounts to floats
-    player_net_tuples = [(name.strip(), float(net)) for name, net in player_net_tuples]
     
     # Initialize lists to store positive and negative net amounts
     positive_net = []
     negative_net = []
     
     # Separate positive and negative net amounts
-    for name, net in player_net_tuples:
+    for name, net in player_net_tuples.items():
         if net > 0:
             positive_net.append((name, net))
         elif net < 0:
@@ -105,24 +104,33 @@ def generate_payouts(player_net_tuples):
     payouts.sort(key=lambda x: x[0])
     return payouts
 
-st.set_page_config(page_title='PokerNow Payouts', page_icon=":spades:", layout='wide')
+st.set_page_config(page_title='PokerNow Payouts', page_icon=":spades:")
 
 st.title("Poker Now Payouts :spades:")
 st.write("This app can be used to generate the payouts for any poker game played on PokerNow. Just copy and paste the game link below")
 
-
+num_games = st.number_input(label = "How many links do you have?", min_value=1, value=1)
+urls = []
 with st.form("URL"):
-    url = st.text_input("Enter game URL")
+    for i in range (num_games):
+        url = st.text_input(f"Enter game {i+1} URL")
+        urls.append(url)
     submitted = st.form_submit_button("Get Payouts")
-if url and submitted:
+if urls and submitted:
+    player_net_sum = {}
+    total_summary_list = []
 
-    df, total = get_ledger(url)
+    for url in urls:
+        df, total = get_ledger(url)
+        df['Net'] = df['Net'].astype(float)
+
+        for player, net in df[['Player', 'Net']].to_records(index=False):
+            player_net_sum[player] = player_net_sum.get(player, 0) + net
+        
+        total_summary_list.append((df, total))
     
     
-    
-    player_net_tuples = list(df[['Player', 'Net']].to_records(index=False))
-    
-    payouts = generate_payouts(player_net_tuples)
+    payouts = generate_payouts(player_net_sum)
     cols = ["", "Buy-In", "Buy-Out", "Stack"]
 
     # Create DataFrame from list and transpose it
@@ -130,13 +138,20 @@ if url and submitted:
 
     col1, col2 = st.columns(2)
     with col1:
-        st.header("Ledger:")
-        st.dataframe(df, hide_index=True)
-        
-        st.dataframe(total_df, hide_index=True)
-
-    # Display payouts in the second column
-    with col2:
         st.header("Payouts:")
         for payer, receiver, amount in payouts:
             st.write(f"{payer.strip()} pays {receiver.strip()} {amount:.2f}")
+
+    # Display payouts in the second column
+    with col2:
+        st.header("Net Earnings")
+        st.dataframe(player_net_sum)
+        
+    st.header("Ledgers:")
+    for item in total_summary_list:
+        st.dataframe(item[0], hide_index=True)
+        cols = ["", "Buy-In", "Buy-Out", "Stack"]
+        total = item[1]
+        total_df = pd.DataFrame([total[:-1]], columns=cols)
+        st.dataframe(total_df, hide_index=True)
+        st.markdown("""---""")
