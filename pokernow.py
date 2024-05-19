@@ -15,9 +15,13 @@ import pandas as pd
 def get_driver():
     service = Service()
     options = Options()
-    return webdriver.Chrome()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    return webdriver.Chrome(options=options)
 
 def get_ledger(url):
+    
     driver = get_driver()
     driver.get(url)
     #time.sleep(1)
@@ -43,11 +47,6 @@ def get_ledger(url):
     # Iterate through each table and print its content
     for table in tables:
         #print(table)
-        # Extract table headers
-        headers = [header.text.strip() for header in table.find_all('th')]
-        if headers:
-            print(headers)
-        # Extract table rows
         rows = []
         for row in table.find_all('tr'):
             rows.append([cell.text.strip() for cell in row.find_all('td')])
@@ -61,7 +60,6 @@ def get_ledger(url):
                 players.append(row)
     df = pd.DataFrame(players, columns=titles)
     return df
-
 import heapq
 
 def generate_payouts(player_net_tuples):
@@ -110,6 +108,6 @@ if url and submitted:
     player_net_tuples = list(df[['Player', 'Net↓']].to_records(index=False))[:-1]
     st.write(player_net_tuples)
     payouts = generate_payouts(player_net_tuples)
-    
+    st.write("PAYOUTS")
     for payer, receiver, amount in payouts:
         st.write(f"{payer.strip()} pays {receiver.strip()} {amount:.2f}")
