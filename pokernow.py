@@ -129,8 +129,6 @@ if urls and submitted:
         
         total_summary_list.append((df, total))
     
-    st.write(player_net_sum)
-    st.write(total_summary_list)
     
     payouts = generate_payouts(player_net_sum)
     cols = ["", "Buy-In", "Buy-Out", "Stack"]
@@ -152,5 +150,13 @@ if urls and submitted:
     st.header("Ledgers:")
     for item in total_summary_list:
         st.dataframe(item[0], hide_index=True)
-        
-        st.dataframe(list(item[1]), hide_index=True)
+        cols = ["", "Buy-In", "Buy-Out", "Stack"]
+        total = item[1]
+        total_df = pd.DataFrame([total[:-1]], columns=cols)
+        st.dataframe(total_df, hide_index=True)
+        st.markdown("""---""")
+
+
+
+    # Create DataFrame from list and transpose it
+    
