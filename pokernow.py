@@ -109,6 +109,10 @@ st.set_page_config(page_title='PokerNow Payouts', page_icon=":spades:")
 st.title("Poker Now Payouts :spades:")
 st.write("This app can be used to generate the payouts for any poker game played on PokerNow. Just copy and paste the game link below")
 
+sideb = st.sidebar
+sideb.header("PokerNow Website")
+sideb.write("[Start a new game](https://www.pokernow.club/start-game)")
+
 num_games = st.number_input(label = "How many links do you have?", min_value=1, value=1)
 urls = []
 with st.form("URL"):
