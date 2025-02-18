@@ -21,12 +21,6 @@ def get_driver():
     options.add_argument("--disable-dev-shm-usage")
     return webdriver.Chrome(options=options)
 
-def df_to_float(value):
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return value
-
 def get_ledger(url):
     
     driver = get_driver()
@@ -107,7 +101,7 @@ def generate_payouts(player_net_tuples):
 st.set_page_config(page_title='PokerNow Payouts', page_icon=":spades:")
 
 st.title("Poker Now Payouts :spades:")
-st.write("This app can be used to generate the payouts for any poker game played on PokerNow. Just copy and paste the game link below")
+st.write("As of 2/10/2025, PokerNow has updated thier code. We are working on an update to accomodate the changes.\nThis app can be used to generate the payouts for any poker game played on PokerNow. Just copy and paste the game link below")
 
 sideb = st.sidebar
 sideb.header("PokerNow Website")
